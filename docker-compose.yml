@@ -1,0 +1,66 @@
+version: "3.8"
+
+
+services:
+
+  turismo-front:
+    build:
+      context: ../turismo-front
+    ports:
+      - 3000:3000
+    environment:
+      - REACT_APP_API1_URL=http://turismo-api:8080
+      - REACT_APP_API2_URL=http://turismo-api-2:3001
+    depends_on:
+      - turismo-api
+      - turismo-api-2
+
+  turismo-api:
+    build:
+      context: ../turismo-api
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/db_turismo-api
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: resende123
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: db_turismo-api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: resende123
+      
+  turismo-api-2:
+    build:
+      context: ../turismo-api-2
+    ports:
+      - 3001:3001
+
+
+  jenkins:
+    image: jenkins/jenkins:lts-jdk11
+    restart: always
+    privileged: true
+    user: root
+    tty: true
+    stdin_open: true
+    ports:
+      - 8090:8080
+      - 50000:50000
+    container_name: "jenkins"
+    environment:
+      - JENKINS_OPTS="--prefix=/jenkins"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+
+
+volumes:
+  jenkins_home:
