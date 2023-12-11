@@ -50,8 +50,8 @@ services:
     depends_on:
       - turismo-front
       - turismo-api
-    ##volumes:
-    ##  - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
   jenkins:
     image: jenkins/jenkins:lts-jdk11
